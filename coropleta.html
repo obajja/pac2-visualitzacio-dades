@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atur regional a la UE</title>
+<link rel="stylesheet" href="estil.css">
+<script src="tema.js"></script>
+<script src="data/atur_nuts2_2025.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<style>
+  :root { --c1: #b7d3f6; --c2: #86b6ef; --c3: #5598e7; --c4: #2a78d6; --c5: #1c5cab; --c6: #0d366b; }
+  /* En fosc, el valor baix s'apropa a la superfície i el valor alt és el més lluminós */
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --c1: #104281; --c2: #1c5cab; --c3: #2a78d6; --c4: #5598e7; --c5: #86b6ef; --c6: #b7d3f6; } }
+  :root[data-theme="dark"] { --c1: #104281; --c2: #1c5cab; --c3: #2a78d6; --c4: #5598e7; --c5: #86b6ef; --c6: #b7d3f6; }
+  .inset-bg { fill: var(--surface); }
+  .region { stroke: var(--surface); stroke-width: .4; }
+  .region.hover { stroke: var(--text-1); stroke-width: 1.5; }
+  .borders { fill: none; stroke: var(--surface); stroke-width: 1.2; stroke-linejoin: round; pointer-events: none; }
+  .context { fill: var(--context-land); stroke: var(--surface); stroke-width: .4; }
+  .inset-frame { fill: none; stroke: var(--axis); stroke-width: 1; }
+  .inset-label { font-size: 11px; }
+  .scale { display: flex; align-items: flex-end; gap: 2px; margin: 0 0 14px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .scale .step { display: flex; flex-direction: column; gap: 4px; min-width: 64px; }
+  .scale .step i { height: 12px; border-radius: 2px; display: block; }
+  .scale .nd i { background: repeating-linear-gradient(45deg, var(--nodata) 0 3px, var(--nodata-ink) 3px 4px); }
+  .scale .caption { width: 100%; color: var(--text-2); font-size: 13px; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="back"><a href="./">← Les tres visualitzacions</a></nav>
+  <p class="eyebrow">Tècnica 2 · Mapa coroplètic</p>
+  <h1>L'atur a la UE té una frontera clara: el sud mediterrani duplica la mitjana europea</h1>
+  <p class="lede">Taxa d'atur (població de 15 a 74 anys) a les 239 regions NUTS 2 de la Unió Europea, any <span class="any">2025</span>.
+    Mitjana UE-27: <b id="eu">6,0 %</b>. Passa el ratolí per sobre d'una regió per veure'n el valor.</p>
+
+  <div class="card">
+    <div class="scale" id="scale"></div>
+    <div class="chart" id="chart"></div>
+    <div class="notes">
+      <p>Font: Eurostat, <a href="https://ec.europa.eu/eurostat/databrowser/view/lfst_r_lfu3rt/default/table">lfst_r_lfu3rt</a> (Enquesta de població activa), any 2025. Geometria: Eurostat GISCO, NUTS 2024, escala 1:20M.</p>
+      <p>Les regions de Canàries, Açores i Madeira es mostren en requadres (a una escala diferent de la del mapa principal); les regions ultraperifèriques franceses s'ometen. Sense dada: Lubuskie (PL), Trier (DE) i Åland (FI).</p>
+      <p>Qualitat de la dada: Eurostat marca 15 regions (sobretot alemanyes) amb fiabilitat baixa («u») i les regions espanyoles i franceses amb una definició que difereix («d»).</p>
+      <p>Eina: <a href="https://d3js.org/">D3.js</a>, projecció azimutal equivalent de Lambert (la de referència oficial per a Europa, ETRS89-LAEA), que conserva les àrees.</p>
+    </div>
+    <details>
+      <summary>Mostra la taula de dades</summary>
+      <div class="table-wrap"><table id="taula"><thead><tr><th>Regió</th><th>País</th><th class="num">Atur (%)</th></tr></thead><tbody></tbody></table></div>
+    </details>
+  </div>
+</main>
+<div class="tooltip" id="tip"></div>
+<script>
+const PAISOS = { AT: "Àustria", BE: "Bèlgica", BG: "Bulgària", CY: "Xipre", CZ: "Txèquia", DE: "Alemanya", DK: "Dinamarca",
+  EE: "Estònia", EL: "Grècia", ES: "Espanya", FI: "Finlàndia", FR: "França", HR: "Croàcia", HU: "Hongria", IE: "Irlanda",
+  IT: "Itàlia", LT: "Lituània", LU: "Luxemburg", LV: "Letònia", MT: "Malta", NL: "Països Baixos", PL: "Polònia",
+  PT: "Portugal", RO: "Romania", SE: "Suècia", SI: "Eslovènia", SK: "Eslovàquia" };
+const BREAKS = [4, 6, 8, 10, 15];
+const LABELS = ["< 4 %", "4–6 %", "6–8 %", "8–10 %", "10–15 %", "≥ 15 %"];
+const INSETS = ["ES70", "PT20", "PT30"];
+const num = (v) => v.toLocaleString("ca-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+let geo;
+
+Promise.resolve(window.DADES_ATUR).then((g) => {
+  geo = g;
+  // d3-geo espera anells en sentit horari; GISCO els serveix a l'inrevés.
+  g.features.forEach((f) => f.geometry && rewind(f.geometry));
+  document.getElementById("eu").textContent = num(g.atur_ue27) + " %";
+  const eu = g.features.filter((f) => f.properties.ue).map((f) => f.properties);
+  const ranked = eu.filter((d) => d.atur != null).sort((a, b) => b.atur - a.atur);
+  ranked.forEach((d, i) => (d.rank = i + 1));
+  d3.select("#taula tbody").selectAll("tr").data(eu.slice().sort((a, b) => (b.atur ?? -1) - (a.atur ?? -1))).join("tr")
+    .html((d) => `<td>${d.nom}</td><td>${PAISOS[d.pais]}</td><td class="num">${d.atur == null ? "—" : num(d.atur)}</td>`);
+  drawScale();
+  render();
+});
+
+function rewind(geom) {
+  // Anell exterior amb àrea plana positiva, forats negativa (convenció de d3-geo)
+  const fix = (poly) => poly.forEach((ring, i) => { if ((d3.polygonArea(ring) > 0) !== (i === 0)) ring.reverse(); });
+  if (geom.type === "Polygon") fix(geom.coordinates);
+  if (geom.type === "MultiPolygon") geom.coordinates.forEach(fix);
+}
+
+function colorOf(css) {
+  const ramp = ["--c1", "--c2", "--c3", "--c4", "--c5", "--c6"].map((v) => css.getPropertyValue(v).trim());
+  return d3.scaleThreshold(BREAKS, ramp);
+}
+
+function drawScale() {
+  const el = d3.select("#scale");
+  el.append("div").attr("class", "caption").text("Taxa d'atur, % de la població activa");
+  LABELS.forEach((l, i) => {
+    const s = el.append("div").attr("class", "step");
+    s.append("i").style("background", `var(--c${i + 1})`);
+    s.append("span").text(l);
+  });
+  const nd = el.append("div").attr("class", "step nd");
+  nd.append("i"); nd.append("span").text("Sense dada");
+}
+
+function render() {
+  const el = document.getElementById("chart");
+  const W = el.clientWidth;
+  const narrow = W < 640;
+  const H = Math.round(W * (narrow ? 1.05 : 0.78));
+  const css = getComputedStyle(document.documentElement);
+  const color = colorOf(css);
+  const insetW = narrow ? 0 : Math.round(W * 0.14);
+
+  const feats = geo.features;
+  const main = feats.filter((f) => f.properties.ue && !INSETS.includes(f.properties.id));
+  const proj = d3.geoAzimuthalEqualArea().rotate([-10, -52]).clipExtent([[0, 0], [W, H]])
+    .fitExtent([[4, 8], [W - 4, H - 8]], { type: "FeatureCollection", features: main });
+  const path = d3.geoPath(proj);
+
+  const svg = d3.create("svg").attr("viewBox", [0, 0, W, H]).attr("role", "img")
+    .attr("aria-label", "Mapa de la taxa d'atur per regions NUTS 2 de la UE");
+
+  // Defs: patró per a les regions sense dada
+  svg.append("defs").append("pattern").attr("id", "nd").attr("width", 4).attr("height", 4)
+    .attr("patternUnits", "userSpaceOnUse").attr("patternTransform", "rotate(45)")
+    .call((p) => {
+      p.append("rect").attr("width", 4).attr("height", 4).attr("fill", css.getPropertyValue("--nodata").trim());
+      p.append("rect").attr("width", 1).attr("height", 4).attr("fill", css.getPropertyValue("--nodata-ink").trim());
+    });
+
+  const fill = (f) => f.properties.atur == null ? "url(#nd)" : color(f.properties.atur);
+  const g = svg.append("g");
+  g.selectAll(".context").data(feats.filter((f) => !f.properties.ue)).join("path").attr("class", "context").attr("d", path);
+  const regions = g.selectAll(".region").data(main).join("path").attr("class", "region").attr("d", path).attr("fill", fill);
+  g.append("path").attr("class", "borders").attr("d", path(countryMesh(main)));
+
+  // Requadres per a les regions ultraperifèriques
+  if (!narrow) {
+    // Requadres a l'Atlàntic, a la cantonada superior esquerra
+    const boxH = Math.round(insetW * 0.62);
+    INSETS.forEach((id, i) => {
+      const f = feats.find((d) => d.properties.id === id);
+      const y0 = 8 + i * (boxH + 8);
+      const p = d3.geoAzimuthalEqualArea().rotate(d3.geoCentroid(f).map((v) => -v)).fitExtent([[10, y0 + 20], [insetW - 8, y0 + boxH - 8]], f);
+      const gi = svg.append("g");
+      gi.append("rect").attr("class", "inset-bg inset-frame").attr("x", 2).attr("y", y0).attr("width", insetW).attr("height", boxH).attr("rx", 6);
+      gi.append("text").attr("class", "inset-label").attr("x", 10).attr("y", y0 + 14).text({ ES70: "Canàries (ES)", PT20: "Açores (PT)", PT30: "Madeira (PT)" }[id]);
+      gi.append("path").datum(f).attr("class", "region").attr("d", d3.geoPath(p)).attr("fill", fill);
+    });
+  }
+
+  svg.selectAll(".region").on("pointerenter pointermove", (e, f) => showTip(e, f)).on("pointerleave", hideTip);
+  el.replaceChildren(svg.node());
+}
+
+// Fronteres estatals: arcs compartits entre regions de països diferents
+let borders;
+function countryMesh(features) {
+  if (!borders) {
+    const topo = topojson.topology({ r: { type: "FeatureCollection", features } });
+    borders = topojson.mesh(topo, topo.objects.r, (a, b) => a.properties.pais !== b.properties.pais);
+  }
+  return borders;
+}
+
+const tip = document.getElementById("tip");
+function showTip(e, f) {
+  const d = f.properties;
+  d3.selectAll(".region").classed("hover", (x) => x === f).filter((x) => x === f).raise();
+  const diff = d.atur == null ? "" : d.atur - geo.atur_ue27;
+  tip.innerHTML = `<b>${d.nom}</b><br><span class="t2">${PAISOS[d.pais]}</span><br>` + (d.atur == null
+    ? "Sense dada"
+    : `Atur: <b>${num(d.atur)} %</b><br><span class="t2">${diff >= 0 ? "+" : "−"}${num(Math.abs(diff))} punts respecte de la UE · posició ${d.rank} de ${d3.sum(geo.features, (x) => x.properties.atur != null)}</span>`);
+  tip.style.opacity = 1;
+  const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8);
+  const y = e.clientY + 14 + tip.offsetHeight > innerHeight ? e.clientY - tip.offsetHeight - 10 : e.clientY + 14;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+function hideTip() { tip.style.opacity = 0; d3.selectAll(".region").classed("hover", false); }
+
+new ResizeObserver(() => geo && render()).observe(document.querySelector("main"));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => geo && render());
+addEventListener("temachange", () => geo && render());
+</script>
+</body>
+</html>

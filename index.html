@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PAC 2 · Visualització de dades</title>
+<link rel="stylesheet" href="estil.css">
+<script src="tema.js"></script>
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 24px; }
+  .grid a { text-decoration: none; color: inherit; display: block; }
+  .grid a:hover .card { border-color: var(--axis); }
+  .grid h2 { font-size: 18px; margin: 4px 0 6px; }
+  .grid p { margin: 0; color: var(--text-2); font-size: 14px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 10px !important; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="back"><span></span></nav>
+  <p class="eyebrow">M2.959 · Visualització de dades · UOC · PAC 2</p>
+  <h1>Tres tècniques, tres conjunts de dades oberts</h1>
+  <p class="lede">Histograma, mapa coroplètic i gràfic Marimekko, cadascun amb unes dades obertes triades perquè encaixin amb el que la tècnica sap mostrar millor: una distribució, un patró geogràfic i una composició en dues dimensions.</p>
+  <div class="grid">
+    <a href="histograma.html"><div class="card">
+      <p class="eyebrow">Tècnica 1</p><h2>Histograma</h2>
+      <p>Distribució de l'esperança de vida en néixer a 217 països.</p>
+      <p class="meta">Banc Mundial · 2024 · Observable Plot</p>
+    </div></a>
+    <a href="coropleta.html"><div class="card">
+      <p class="eyebrow">Tècnica 2</p><h2>Mapa coroplètic</h2>
+      <p>Taxa d'atur a les 239 regions NUTS 2 de la Unió Europea.</p>
+      <p class="meta">Eurostat · 2025 · D3.js</p>
+    </div></a>
+    <a href="marimekko.html"><div class="card">
+      <p class="eyebrow">Tècnica 3</p><h2>Gràfic Marimekko</h2>
+      <p>Mix de generació elèctrica dels països de la UE-27.</p>
+      <p class="meta">Our World in Data / Ember · 2024 · D3.js</p>
+    </div></a>
+  </div>
+</main>
+</body>
+</html>

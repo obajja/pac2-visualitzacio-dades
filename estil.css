@@ -1,0 +1,117 @@
+/* Estil compartit de les tres visualitzacions (PAC 2) */
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --text-1: #0b0b0b;
+  --text-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.10);
+  --nodata: #e8e7e2;
+  --nodata-ink: #c3c2b7;
+  --context-land: #efeee9;
+  --tip-bg: #ffffff;
+  --accent: #2a78d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --text-1: #f0efec;
+    --text-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --nodata: #2c2c2a;
+    --nodata-ink: #4a4a46;
+    --context-land: #232322;
+    --tip-bg: #262625;
+    --accent: #3987e5;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --text-1: #f0efec;
+  --text-2: #c3c2b7;
+  --muted: #898781;
+  --grid: #2c2c2a;
+  --axis: #383835;
+  --border: rgba(255, 255, 255, 0.10);
+  --nodata: #2c2c2a;
+  --nodata-ink: #4a4a46;
+  --context-land: #232322;
+  --tip-bg: #262625;
+  --accent: #3987e5;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--page);
+  color: var(--text-1);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+main { max-width: 1080px; margin: 0 auto; padding: 32px 16px 48px; }
+a { color: var(--accent); }
+
+.eyebrow { color: var(--muted); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; margin: 0 0 6px; }
+h1 { font-size: 26px; line-height: 1.25; margin: 0 0 8px; font-weight: 650; text-wrap: balance; }
+.lede { color: var(--text-2); margin: 0 0 20px; max-width: 72ch; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; margin: 0 0 14px; color: var(--text-2); font-size: 14px; }
+.controls label { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.seg button {
+  font: inherit; font-size: 13px; color: var(--text-2); background: transparent;
+  border: 0; padding: 4px 10px; cursor: pointer;
+}
+.seg button + button { border-left: 1px solid var(--border); }
+.seg button[aria-pressed="true"] { background: var(--grid); color: var(--text-1); font-weight: 600; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--text-2); margin: 0 0 12px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+
+.chart { width: 100%; position: relative; }
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart text { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+
+.tooltip {
+  position: fixed; pointer-events: none; z-index: 10;
+  background: var(--tip-bg); color: var(--text-1);
+  border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .12);
+  padding: 8px 10px; font-size: 13px; line-height: 1.4; max-width: 260px;
+  opacity: 0; transition: opacity .08s;
+}
+.tooltip b { font-weight: 600; }
+.tooltip .t2 { color: var(--text-2); }
+
+.notes { color: var(--text-2); font-size: 13px; margin-top: 16px; }
+.notes p { margin: 4px 0; }
+details { margin-top: 16px; font-size: 14px; }
+summary { cursor: pointer; color: var(--text-2); }
+table { border-collapse: collapse; width: 100%; margin-top: 8px; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid var(--grid); }
+th { color: var(--text-2); font-weight: 600; }
+td.num, th.num { text-align: right; }
+.table-wrap { max-height: 360px; overflow: auto; }
+
+[hidden] { display: none !important; }
+nav.back { margin-bottom: 18px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.theme-toggle {
+  font: inherit; font-size: 13px; color: var(--text-2); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px; padding: 4px 10px; cursor: pointer;
+}

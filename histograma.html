@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Esperança de vida mundial</title>
+<link rel="stylesheet" href="estil.css">
+<script src="tema.js"></script>
+<script src="data/esperanca_vida_2024.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.16/dist/plot.umd.min.js"></script>
+<style>
+  :root { --s1: #2a78d6; --s2: #eb6834; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --s1: #3987e5; --s2: #d95926; } }
+  :root[data-theme="dark"] { --s1: #3987e5; --s2: #d95926; }
+  .chart figure { margin: 0; }
+  .chart [aria-label="tip"] { font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="back"><a href="./">← Les tres visualitzacions</a></nav>
+  <p class="eyebrow">Tècnica 1 · Histograma</p>
+  <h1>7 de cada 10 països superen els 70 anys d'esperança de vida, però una cua llarga es queda molt enrere</h1>
+  <p class="lede">Distribució de l'esperança de vida en néixer de <span id="n">217</span> països i territoris l'any 2024.
+    Cada barra compta quants països cauen dins d'un interval d'edat.</p>
+
+  <div class="card">
+    <div class="controls">
+      <span>Amplada de l'interval:
+        <span class="seg" id="bins" role="group" aria-label="Amplada de l'interval">
+          <button data-w="1">1 any</button><button data-w="2.5" aria-pressed="true">2,5 anys</button><button data-w="5">5 anys</button>
+        </span>
+      </span>
+      <label><input type="checkbox" id="ssa"> Destaca l'Àfrica subsahariana</label>
+    </div>
+    <div class="legend" id="legend" hidden>
+      <span><i style="background:var(--s2)"></i>Àfrica subsahariana</span>
+      <span><i style="background:var(--s1)"></i>Resta del món</span>
+    </div>
+    <div class="chart" id="chart"></div>
+    <div class="notes">
+      <p>Font: Banc Mundial, indicador <a href="https://data.worldbank.org/indicator/SP.DYN.LE00.IN">SP.DYN.LE00.IN</a> (World Development Indicators), any 2024. S'han exclòs els agregats regionals.</p>
+      <p>Eina: <a href="https://observablehq.com/plot/">Observable Plot</a> (JavaScript). Dades i codi: <a href="data/esperanca_vida_2024.csv">CSV</a>.</p>
+    </div>
+    <details>
+      <summary>Mostra la taula de dades</summary>
+      <div class="table-wrap"><table id="taula"><thead><tr><th>País</th><th>Regió</th><th class="num">Anys</th></tr></thead><tbody></tbody></table></div>
+    </details>
+  </div>
+</main>
+<script>
+const SSA = "Sub-Saharan Africa";
+const fmt = d3.format(".1f");
+const fmtCa = (v) => fmt(v).replace(".", ",");
+let data = [], width = 2.5, highlight = false;
+
+Promise.resolve(d3.csvParse(window.DADES_ESPERANCA, d3.autoType)).then((rows) => {
+  data = rows;
+  // Enllaç directe amb la vista destacada: histograma.html#ssa
+  if (location.hash === "#ssa") { highlight = true; document.getElementById("ssa").checked = true; document.getElementById("legend").hidden = false; }
+  document.getElementById("n").textContent = rows.length;
+  d3.select("#taula tbody").selectAll("tr").data([...rows].reverse()).join("tr")
+    .html((d) => `<td>${d.pais}</td><td>${d.regio}</td><td class="num">${fmtCa(d.esperanca_vida)}</td>`);
+  render();
+});
+
+function bins(w) {
+  const thresholds = d3.range(50, 90 + w / 2, w);
+  const groups = highlight ? [SSA, "rest"] : ["all"];
+  const out = [];
+  const binner = d3.bin().domain([50, 90]).thresholds(thresholds).value((d) => d.esperanca_vida);
+  for (const g of groups) {
+    const subset = g === "all" ? data : data.filter((d) => (d.regio === SSA) === (g === SSA));
+    for (const b of binner(subset)) {
+      out.push({ x1: b.x0, x2: b.x1, n: b.length, group: g, names: b.map((d) => d.pais) });
+    }
+  }
+  return out;
+}
+
+function tipText(d) {
+  const label = d.group === SSA ? " (Àfrica subsahariana)" : d.group === "rest" ? " (resta del món)" : "";
+  const names = d.names.slice().reverse();
+  const list = names.length > 6 ? names.slice(0, 6).join(", ") + ` i ${names.length - 6} més` : names.join(", ");
+  return `${fmtCa(d.x1)}–${fmtCa(d.x2)} anys${label}\n${d.n} ${d.n === 1 ? "país" : "països"}${d.n ? ": " + list : ""}`;
+}
+
+function render() {
+  const el = document.getElementById("chart");
+  const w = el.clientWidth;
+  const css = getComputedStyle(document.documentElement);
+  const c = (v) => css.getPropertyValue(v).trim();
+  const values = data.map((d) => d.esperanca_vida);
+  const median = d3.median(values);
+  const b = bins(width);
+  const fill = (d) => d.group === SSA ? c("--s2") : c("--s1");
+
+  const plot = Plot.plot({
+    width: w,
+    height: Math.max(320, Math.min(440, w * 0.5)),
+    marginLeft: 40, marginBottom: 44, marginTop: 28,
+    style: { background: "transparent", color: c("--muted"), fontSize: "12px" },
+    x: { domain: [50, 90], label: "Esperança de vida en néixer (anys) →", labelAnchor: "right", ticks: 8 },
+    y: { label: "↑ Nombre de països", grid: true, nice: true },
+    marks: [
+      Plot.gridY({ stroke: c("--grid"), strokeOpacity: 1 }),
+      Plot.rectY(b, {
+        x1: "x1", x2: "x2", y: "n", fill, insetLeft: 1, insetRight: 1,
+        ...(highlight ? {} : { rx1y2: 4, rx2y2: 4 }),
+        // Segments apilats separats per un buit del color de la superfície
+        ...(highlight ? { stroke: c("--surface"), strokeWidth: 1 } : {}),
+        title: tipText,
+        tip: { fill: c("--tip-bg"), stroke: c("--border"), textPadding: 8 },
+      }),
+      Plot.ruleY([0], { stroke: c("--axis") }),
+      Plot.ruleX([median], { stroke: c("--text-2"), strokeWidth: 1.5 }),
+      Plot.text([median], {
+        x: (d) => d, frameAnchor: "top", dy: -14, textAnchor: "end", dx: -6,
+        text: (d) => `Mediana ${fmtCa(d)} anys`, fill: c("--text-2"), fontWeight: 600,
+      }),
+      Plot.text([{ x: 58.5 }], {
+        x: "x", frameAnchor: "top", dy: 18, textAnchor: "middle", lineWidth: 14,
+        text: () => "Cua esquerra: 27 països per sota dels 65 anys, 26 dels quals a l'Àfrica subsahariana",
+        fill: c("--text-2"), stroke: c("--surface"), strokeWidth: 4,
+      }),
+    ],
+  });
+  el.replaceChildren(plot);
+}
+
+document.querySelectorAll("#bins button").forEach((btn) => btn.addEventListener("click", () => {
+  document.querySelectorAll("#bins button").forEach((b) => b.setAttribute("aria-pressed", b === btn));
+  width = +btn.dataset.w;
+  render();
+}));
+document.getElementById("ssa").addEventListener("change", (e) => {
+  highlight = e.target.checked;
+  document.getElementById("legend").hidden = !highlight;
+  render();
+});
+new ResizeObserver(() => data.length && render()).observe(document.getElementById("chart"));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => data.length && render());
+addEventListener("temachange", () => data.length && render());
+</script>
+</body>
+</html>

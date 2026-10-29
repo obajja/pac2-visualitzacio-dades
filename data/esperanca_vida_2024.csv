@@ -1,0 +1,218 @@
+iso3,pais,regio,esperanca_vida
+NGA,Nigeria,Sub-Saharan Africa,54.63
+TCD,Chad,Sub-Saharan Africa,55.24
+CAF,Central African Republic,Sub-Saharan Africa,57.67
+SSD,South Sudan,Sub-Saharan Africa,57.74
+LSO,Lesotho,Sub-Saharan Africa,57.8
+SOM,"Somalia, Fed. Rep.",Sub-Saharan Africa,58.97
+MLI,Mali,Sub-Saharan Africa,60.67
+GIN,Guinea,Sub-Saharan Africa,60.9
+BEN,Benin,Sub-Saharan Africa,60.96
+BFA,Burkina Faso,Sub-Saharan Africa,61.29
+NER,Niger,Sub-Saharan Africa,61.43
+SLE,Sierra Leone,Sub-Saharan Africa,61.96
+COD,"Congo, Dem. Rep.",Sub-Saharan Africa,62.07
+CIV,Cote d'Ivoire,Sub-Saharan Africa,62.11
+NRU,Naoero,East Asia & Pacific,62.28
+LBR,Liberia,Sub-Saharan Africa,62.32
+TGO,Togo,Sub-Saharan Africa,62.94
+ZWE,Zimbabwe,Sub-Saharan Africa,63.06
+MOZ,Mozambique,Sub-Saharan Africa,63.8
+BDI,Burundi,Sub-Saharan Africa,63.82
+KEN,Kenya,Sub-Saharan Africa,63.83
+MDG,Madagascar,Sub-Saharan Africa,63.84
+GNQ,Equatorial Guinea,Sub-Saharan Africa,63.91
+CMR,Cameroon,Sub-Saharan Africa,63.97
+GNB,Guinea-Bissau,Sub-Saharan Africa,64.25
+SWZ,Eswatini,Sub-Saharan Africa,64.26
+AGO,Angola,Sub-Saharan Africa,64.81
+HTI,Haiti,Latin America & Caribbean,65.12
+GHA,Ghana,Sub-Saharan Africa,65.69
+COG,"Congo, Rep.",Sub-Saharan Africa,66.0
+GMB,"Gambia, The",Sub-Saharan Africa,66.06
+DJI,Djibouti,"Middle East, North Africa, Afghanistan & Pakistan",66.2
+PNG,Papua New Guinea,East Asia & Pacific,66.26
+AFG,Afghanistan,"Middle East, North Africa, Afghanistan & Pakistan",66.29
+ZAF,South Africa,Sub-Saharan Africa,66.31
+SDN,Sudan,Sub-Saharan Africa,66.52
+ZMB,Zambia,Sub-Saharan Africa,66.53
+KIR,Kiribati,East Asia & Pacific,66.6
+COM,Comoros,Sub-Saharan Africa,67.02
+MHL,Marshall Islands,East Asia & Pacific,67.08
+MMR,Myanmar,East Asia & Pacific,67.09
+TZA,Tanzania,Sub-Saharan Africa,67.21
+TUV,Tuvalu,East Asia & Pacific,67.26
+FSM,"Micronesia, Fed. Sts.",East Asia & Pacific,67.36
+FJI,Fiji,East Asia & Pacific,67.46
+NAM,Namibia,Sub-Saharan Africa,67.52
+MWI,Malawi,Sub-Saharan Africa,67.56
+ETH,Ethiopia,Sub-Saharan Africa,67.6
+PAK,Pakistan,"Middle East, North Africa, Afghanistan & Pakistan",67.8
+TLS,Timor-Leste,East Asia & Pacific,67.9
+RWA,Rwanda,Sub-Saharan Africa,68.02
+UGA,Uganda,Sub-Saharan Africa,68.49
+GAB,Gabon,Sub-Saharan Africa,68.51
+MRT,Mauritania,Sub-Saharan Africa,68.71
+BOL,Bolivia,Latin America & Caribbean,68.74
+ERI,Eritrea,Sub-Saharan Africa,68.89
+SEN,Senegal,Sub-Saharan Africa,68.92
+PSE,West Bank and Gaza,"Middle East, North Africa, Afghanistan & Pakistan",69.21
+LAO,Lao PDR,East Asia & Pacific,69.22
+BWA,Botswana,Sub-Saharan Africa,69.29
+PLW,Palau,East Asia & Pacific,69.38
+YEM,"Yemen, Rep.","Middle East, North Africa, Afghanistan & Pakistan",69.44
+STP,Sao Tome and Principe,Sub-Saharan Africa,69.91
+PHL,Philippines,East Asia & Pacific,69.95
+TKM,Turkmenistan,Europe & Central Asia,70.2
+GRL,Greenland,Europe & Central Asia,70.27
+GUY,Guyana,Latin America & Caribbean,70.32
+NPL,Nepal,South Asia,70.64
+SLB,Solomon Islands,East Asia & Pacific,70.69
+KHM,Cambodia,East Asia & Pacific,70.82
+LBY,Libya,"Middle East, North Africa, Afghanistan & Pakistan",71.12
+DMA,Dominica,Latin America & Caribbean,71.29
+IDN,Indonesia,East Asia & Pacific,71.29
+MDA,Moldova,Europe & Central Asia,71.33
+VCT,St. Vincent and the Grenadines,Latin America & Caribbean,71.38
+JAM,Jamaica,Latin America & Caribbean,71.61
+VUT,Vanuatu,East Asia & Pacific,71.65
+EGY,"Egypt, Arab Rep.","Middle East, North Africa, Afghanistan & Pakistan",71.81
+WSM,Samoa,East Asia & Pacific,71.83
+TJK,Tajikistan,Europe & Central Asia,71.93
+IND,India,South Asia,72.23
+KNA,St. Kitts and Nevis,Latin America & Caribbean,72.28
+SLV,El Salvador,Latin America & Caribbean,72.3
+KGZ,Kyrgyz Republic,Europe & Central Asia,72.4
+MNG,Mongolia,East Asia & Pacific,72.4
+IRQ,Iraq,"Middle East, North Africa, Afghanistan & Pakistan",72.42
+UZB,Uzbekistan,Europe & Central Asia,72.53
+SYR,Syrian Arab Republic,"Middle East, North Africa, Afghanistan & Pakistan",72.56
+VEN,"Venezuela, RB",Latin America & Caribbean,72.67
+GTM,Guatemala,Latin America & Caribbean,72.75
+LCA,St. Lucia,Latin America & Caribbean,72.85
+ASM,American Samoa,East Asia & Pacific,72.99
+HND,Honduras,Latin America & Caribbean,73.04
+TON,Tonga,East Asia & Pacific,73.07
+BTN,Bhutan,South Asia,73.26
+RUS,Russian Federation,Europe & Central Asia,73.44
+TTO,Trinidad and Tobago,Latin America & Caribbean,73.62
+BLZ,Belize,Latin America & Caribbean,73.74
+PRK,"Korea, Dem. People's Rep.",East Asia & Pacific,73.74
+SUR,Suriname,Latin America & Caribbean,73.76
+MUS,Mauritius,Sub-Saharan Africa,73.79
+DOM,Dominican Republic,Latin America & Caribbean,73.87
+PRY,Paraguay,Latin America & Caribbean,73.98
+BLR,Belarus,Europe & Central Asia,74.37
+KAZ,Kazakhstan,Europe & Central Asia,74.53
+AZE,Azerbaijan,Europe & Central Asia,74.58
+GEO,Georgia,Europe & Central Asia,74.66
+UKR,Ukraine,Europe & Central Asia,74.69
+BHS,"Bahamas, The",Latin America & Caribbean,74.71
+VNM,Viet Nam,East Asia & Pacific,74.74
+BGD,Bangladesh,South Asia,74.93
+NIC,Nicaragua,Latin America & Caribbean,75.1
+MEX,Mexico,Latin America & Caribbean,75.26
+GRD,Grenada,Latin America & Caribbean,75.37
+MAR,Morocco,"Middle East, North Africa, Afghanistan & Pakistan",75.49
+BRN,Brunei Darussalam,East Asia & Pacific,75.5
+BGR,Bulgaria,Europe & Central Asia,75.76
+SRB,Serbia,Europe & Central Asia,75.97
+BRA,Brazil,Latin America & Caribbean,76.02
+CPV,Cabo Verde,Sub-Saharan Africa,76.22
+SYC,Seychelles,Sub-Saharan Africa,76.3
+BRB,Barbados,Latin America & Caribbean,76.33
+LVA,Latvia,Europe & Central Asia,76.43
+ROU,Romania,Europe & Central Asia,76.46
+DZA,Algeria,"Middle East, North Africa, Afghanistan & Pakistan",76.47
+ABW,Aruba,Latin America & Caribbean,76.5
+SXM,Sint Maarten (Dutch part),Latin America & Caribbean,76.53
+THA,Thailand,East Asia & Pacific,76.56
+MKD,North Macedonia,Europe & Central Asia,76.62
+TUN,Tunisia,"Middle East, North Africa, Afghanistan & Pakistan",76.71
+HUN,Hungary,Europe & Central Asia,76.72
+MYS,Malaysia,East Asia & Pacific,76.82
+CUW,Curacao,Latin America & Caribbean,76.99
+LTU,Lithuania,Europe & Central Asia,77.2
+GUM,Guam,East Asia & Pacific,77.42
+TUR,Turkiye,Europe & Central Asia,77.42
+VGB,British Virgin Islands,Latin America & Caribbean,77.43
+ARG,Argentina,Latin America & Caribbean,77.54
+ECU,Ecuador,Latin America & Caribbean,77.58
+LKA,Sri Lanka,South Asia,77.67
+ATG,Antigua and Barbuda,Latin America & Caribbean,77.77
+IRN,"Iran, Islamic Rep.","Middle East, North Africa, Afghanistan & Pakistan",77.85
+MNE,Montenegro,Europe & Central Asia,77.89
+COL,Colombia,Latin America & Caribbean,77.91
+LBN,Lebanon,"Middle East, North Africa, Afghanistan & Pakistan",77.94
+PER,Peru,Latin America & Caribbean,77.94
+JOR,Jordan,"Middle East, North Africa, Afghanistan & Pakistan",77.98
+CHN,China,East Asia & Pacific,78.02
+BIH,Bosnia and Herzegovina,Europe & Central Asia,78.04
+TCA,Turks and Caicos Islands,Latin America & Caribbean,78.18
+XKX,Kosovo,Europe & Central Asia,78.22
+CUB,Cuba,Latin America & Caribbean,78.26
+URY,Uruguay,Latin America & Caribbean,78.29
+ARM,Armenia,Europe & Central Asia,78.32
+SVK,Slovak Republic,Europe & Central Asia,78.37
+POL,Poland,Europe & Central Asia,78.41
+USA,United States,North America,78.89
+NCL,New Caledonia,East Asia & Pacific,78.92
+HRV,Croatia,Europe & Central Asia,78.93
+MNP,Northern Mariana Islands,East Asia & Pacific,78.95
+SAU,Saudi Arabia,"Middle East, North Africa, Afghanistan & Pakistan",78.98
+EST,Estonia,Europe & Central Asia,79.3
+ALB,Albania,Europe & Central Asia,79.78
+PAN,Panama,Latin America & Caribbean,79.78
+CZE,Czechia,Europe & Central Asia,79.98
+OMN,Oman,"Middle East, North Africa, Afghanistan & Pakistan",80.25
+MAF,St. Martin (French part),Latin America & Caribbean,80.44
+CYM,Cayman Islands,Latin America & Caribbean,80.54
+VIR,Virgin Islands (U.S.),Latin America & Caribbean,80.77
+DEU,Germany,Europe & Central Asia,80.79
+CRI,Costa Rica,Latin America & Caribbean,81.0
+IMN,Isle of Man,Europe & Central Asia,81.09
+CHI,Channel Islands,Europe & Central Asia,81.2
+MDV,Maldives,South Asia,81.28
+CHL,Chile,Latin America & Caribbean,81.36
+GBR,United Kingdom,Europe & Central Asia,81.39
+BHR,Bahrain,"Middle East, North Africa, Afghanistan & Pakistan",81.42
+CYP,Cyprus,Europe & Central Asia,81.82
+GRC,Greece,Europe & Central Asia,81.84
+PRI,Puerto Rico (US),Latin America & Caribbean,81.9
+NLD,Netherlands,Europe & Central Asia,81.97
+AUT,Austria,Europe & Central Asia,82.0
+NZL,New Zealand,East Asia & Pacific,82.01
+CAN,Canada,North America,82.11
+DNK,Denmark,Europe & Central Asia,82.25
+SVN,Slovenia,Europe & Central Asia,82.29
+BEL,Belgium,Europe & Central Asia,82.3
+FIN,Finland,Europe & Central Asia,82.34
+PRT,Portugal,Europe & Central Asia,82.38
+BMU,Bermuda,North America,82.49
+QAT,Qatar,"Middle East, North Africa, Afghanistan & Pakistan",82.52
+ISL,Iceland,Europe & Central Asia,82.81
+MLT,Malta,"Middle East, North Africa, Afghanistan & Pakistan",82.96
+FRA,France,Europe & Central Asia,82.98
+IRL,Ireland,Europe & Central Asia,83.01
+AUS,Australia,East Asia & Pacific,83.05
+ARE,United Arab Emirates,"Middle East, North Africa, Afghanistan & Pakistan",83.07
+FRO,Faroe Islands,Europe & Central Asia,83.08
+NOR,Norway,Europe & Central Asia,83.16
+ISR,Israel,"Middle East, North Africa, Afghanistan & Pakistan",83.2
+LUX,Luxembourg,Europe & Central Asia,83.2
+MAC,"Macao SAR, China",East Asia & Pacific,83.33
+SGP,Singapore,East Asia & Pacific,83.35
+GIB,Gibraltar,Europe & Central Asia,83.63
+KOR,"Korea, Rep.",East Asia & Pacific,83.63
+ESP,Spain,Europe & Central Asia,83.89
+ITA,Italy,Europe & Central Asia,83.95
+JPN,Japan,East Asia & Pacific,84.04
+SWE,Sweden,Europe & Central Asia,84.06
+AND,Andorra,Europe & Central Asia,84.19
+PYF,French Polynesia,East Asia & Pacific,84.19
+LIE,Liechtenstein,Europe & Central Asia,84.2
+CHE,Switzerland,Europe & Central Asia,84.41
+KWT,Kuwait,"Middle East, North Africa, Afghanistan & Pakistan",84.58
+HKG,"Hong Kong SAR, China",East Asia & Pacific,85.39
+SMR,San Marino,Europe & Central Asia,85.82
+MCO,Monaco,Europe & Central Asia,86.5

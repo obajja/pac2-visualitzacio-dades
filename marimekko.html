@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mix elèctric europeu</title>
+<link rel="stylesheet" href="estil.css">
+<script src="tema.js"></script>
+<script src="data/mix_electric_ue_2024.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<style>
+  /* Ordre validat (CVD protan/deutan ΔE ≥ 8,4 entre veïns, clar i fosc) */
+  :root { --gas: #e34948; --carbo: #6250d6; --nuclear: #eb6834; --bio: #1baf7a; --solar: #eda100; --hidro: #2a78d6; --eolica: #008300; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --gas: #e66767; --carbo: #9085e9; --nuclear: #d95926; --bio: #199e70; --solar: #c98500; --hidro: #3987e5; --eolica: #008300; } }
+  :root[data-theme="dark"] { --gas: #e66767; --carbo: #9085e9; --nuclear: #d95926; --bio: #199e70; --solar: #c98500; --hidro: #3987e5; --eolica: #008300; }
+  .seg-rect { stroke: var(--surface); stroke-width: 2; cursor: default; }
+  .seg-rect.dim { opacity: .35; }
+  .chart .col-label { fill: var(--text-1); font-weight: 600; }
+  .chart .col-sub { fill: var(--muted); }
+  .chart .in-label { font-size: 11px; font-weight: 600; pointer-events: none; }
+  .legend .grp { color: var(--muted); margin-left: 10px; margin-right: -6px; }
+  .legend .grp:first-child { margin-left: 0; }
+</style>
+</head>
+<body>
+<main>
+  <nav class="back"><a href="./">← Les tres visualitzacions</a></nav>
+  <p class="eyebrow">Tècnica 3 · Gràfic Marimekko</p>
+  <h1>Qui produeix l'electricitat de la UE, i amb què?</h1>
+  <p class="lede">L'amplada de cada columna és l'electricitat total que genera el país (TWh, any 2024);
+    l'alçada de cada segment, el pes de cada font dins d'aquell país. L'àrea de cada rectangle és, per tant, l'energia real generada.</p>
+
+  <div class="card">
+    <div class="controls">
+      <span>Ordena les columnes per:
+        <span class="seg" id="sort" role="group" aria-label="Ordre de les columnes">
+          <button data-k="total" aria-pressed="true">Generació total</button><button data-k="renov">% renovable</button><button data-k="fossil">% fòssil</button>
+        </span>
+      </span>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="chart" id="chart"></div>
+    <div class="notes">
+      <p>Font: <a href="https://ourworldindata.org/grapher/electricity-prod-source-stacked">Our World in Data</a> a partir d'Ember (Yearly Electricity Data) i Energy Institute, any 2024. Generació bruta en TWh.</p>
+      <p>Es mostren els 10 països amb més generació; els 17 restants s'agrupen a «Resta UE». «Gas i petroli» inclou el gasoil; «Bioenergia i altres» inclou la geotèrmica i les marines.</p>
+      <p>Eina: <a href="https://d3js.org/">D3.js</a>. Eines com Flourish tenen plantilla de Marimekko; amb D3 la geometria es calcula directament, i això permet controlar l'ordre de les columnes, l'ordre de l'apilat (renovables a la base) i les etiquetes.</p>
+    </div>
+    <details>
+      <summary>Mostra la taula de dades (TWh)</summary>
+      <div class="table-wrap"><table id="taula"><thead></thead><tbody></tbody></table></div>
+    </details>
+  </div>
+</main>
+<div class="tooltip" id="tip"></div>
+<script>
+// Ordre de dalt a baix dins de cada columna: fòssils, nuclear, renovables (eòlica a la base)
+const FONTS = [
+  { k: "Gas i petroli", v: "--gas", grup: "fossil" },
+  { k: "Carbó", v: "--carbo", grup: "fossil" },
+  { k: "Nuclear", v: "--nuclear", grup: "nuclear" },
+  { k: "Bioenergia i altres", v: "--bio", grup: "renov" },
+  { k: "Solar", v: "--solar", grup: "renov" },
+  { k: "Hidràulica", v: "--hidro", grup: "renov" },
+  { k: "Eòlica", v: "--eolica", grup: "renov" },
+];
+const CODI = { "França": "FR", "Alemanya": "DE", "Espanya": "ES", "Itàlia": "IT", "Suècia": "SE", "Polònia": "PL",
+  "Països Baixos": "NL", "Finlàndia": "FI", "Àustria": "AT", "Bèlgica": "BE" };
+const INK = { "--solar": "#0b0b0b" }; // etiqueta fosca sobre el groc
+const pct = (v) => (v * 100).toLocaleString("ca-ES", { maximumFractionDigits: 0 }) + " %";
+const twh = (v) => v.toLocaleString("ca-ES", { maximumFractionDigits: v < 10 ? 1 : 0 }) + " TWh";
+let rows = [], sortKey = "total", total = 0;
+
+Promise.resolve(d3.csvParse(window.DADES_MIX, d3.autoType)).then((data) => {
+  rows = data.map((d) => {
+    const t = d3.sum(FONTS, (f) => d[f.k]);
+    const share = (g) => d3.sum(FONTS.filter((f) => f.grup === g), (f) => d[f.k]) / t;
+    return { ...d, total: t, renov: share("renov"), fossil: share("fossil"), resta: d.pais.startsWith("Resta") };
+  });
+  total = d3.sum(rows, (d) => d.total);
+  legend();
+  table();
+  render();
+});
+
+function legend() {
+  const el = d3.select("#legend");
+  let last = null;
+  for (const f of FONTS) {
+    if (f.grup !== last) {
+      el.append("span").attr("class", "grp").text({ fossil: "Fòssils", nuclear: "", renov: "Renovables" }[f.grup]);
+      last = f.grup;
+    }
+    el.append("span").html(`<i style="background:var(${f.v})"></i>${f.k}`);
+  }
+}
+
+function table() {
+  d3.select("#taula thead").html(`<tr><th>País</th>${FONTS.map((f) => `<th class="num">${f.k}</th>`).join("")}<th class="num">Total</th><th class="num">% renov.</th></tr>`);
+  d3.select("#taula tbody").selectAll("tr").data(rows).join("tr").html((d) =>
+    `<td>${d.pais}</td>${FONTS.map((f) => `<td class="num">${d[f.k].toLocaleString("ca-ES", { maximumFractionDigits: 1 })}</td>`).join("")}` +
+    `<td class="num">${d.total.toLocaleString("ca-ES", { maximumFractionDigits: 0 })}</td><td class="num">${pct(d.renov)}</td>`);
+}
+
+function render() {
+  const el = document.getElementById("chart");
+  const W = el.clientWidth;
+  const css = getComputedStyle(document.documentElement);
+  const color = (f) => css.getPropertyValue(f.v).trim();
+  const M = { top: 46, right: 4, bottom: 44, left: 40 };
+  const H = Math.max(380, Math.min(540, W * 0.58));
+  const iw = W - M.left - M.right, ih = H - M.top - M.bottom;
+  const GAP = 2;
+
+  const ordered = rows.filter((d) => !d.resta).sort((a, b) => b[sortKey] - a[sortKey]).concat(rows.filter((d) => d.resta));
+  const x = d3.scaleLinear([0, total], [0, iw]);
+  const y = d3.scaleLinear([0, 1], [ih, 0]);
+  let acc = 0;
+  const cols = ordered.map((d) => { const c = { d, x0: acc, x1: acc + d.total }; acc += d.total; return c; });
+
+  const svg = d3.create("svg").attr("viewBox", [0, 0, W, H]).attr("role", "img")
+    .attr("aria-label", "Gràfic Marimekko del mix elèctric dels països de la UE");
+  const g = svg.append("g").attr("transform", `translate(${M.left},${M.top})`);
+
+  // Eix Y: percentatge dins de cada país
+  g.append("g").call(d3.axisLeft(y).ticks(5).tickFormat((v) => v * 100 + " %").tickSize(0).tickPadding(8))
+    .call((a) => a.select(".domain").remove());
+  // Eix X: generació acumulada
+  g.append("g").attr("transform", `translate(0,${ih})`)
+    .call(d3.axisBottom(x).ticks(W < 600 ? 3 : 6).tickFormat((v) => v.toLocaleString("ca-ES")).tickSize(4).tickPadding(6))
+    .call((a) => a.select(".domain").attr("stroke", "var(--axis)"))
+    .call((a) => a.selectAll(".tick line").attr("stroke", "var(--axis)"));
+  g.append("text").attr("x", iw).attr("y", ih + 36).attr("text-anchor", "end")
+    .text(`Generació elèctrica acumulada (TWh) → total UE-27: ${twh(total)}`);
+
+  const colG = g.selectAll(".col").data(cols).join("g").attr("class", "col");
+  colG.each(function (c) {
+    const cg = d3.select(this);
+    const x0 = x(c.x0) + GAP / 2, w = Math.max(1, x(c.x1) - x(c.x0) - GAP);
+    let top = 0;
+    for (const f of FONTS) {
+      const share = c.d[f.k] / c.d.total;
+      if (share <= 0) continue;
+      const y0 = y(1 - top), y1 = y(1 - top - share);
+      top += share;
+      cg.append("rect").attr("class", "seg-rect").datum({ c, f, share })
+        .attr("x", x0).attr("width", w).attr("y", y0).attr("height", Math.max(0, y1 - y0)).attr("fill", color(f));
+      // Etiqueta dins del segment només si hi cap amb marge
+      const label = pct(share);
+      if (y1 - y0 >= 18 && w >= label.length * 6.5 + 10 && share >= 0.15) {
+        cg.append("text").attr("class", "in-label").attr("x", x0 + w / 2).attr("y", (y0 + y1) / 2 + 4)
+          .attr("text-anchor", "middle").style("fill", INK[f.v] || "#ffffff").text(label);
+      }
+    }
+    // Capçalera: nom si hi cap; si no, codi curt
+    const name = c.d.pais, short = c.d.resta ? "Resta" : CODI[name] ?? "";
+    const fits = w >= name.length * 7 + 4, fitsShort = w >= short.length * 7 + 2;
+    cg.append("text").attr("class", "col-label").attr("x", x0 + w / 2).attr("y", -22).attr("text-anchor", "middle")
+      .text(fits ? name : fitsShort ? short : "");
+    cg.append("text").attr("class", "col-sub").attr("x", x0 + w / 2).attr("y", -8).attr("text-anchor", "middle")
+      .text(w >= 52 ? twh(c.d.total) : w >= 30 ? Math.round(c.d.total) : "");
+  });
+
+  g.selectAll(".seg-rect").on("pointerenter pointermove", (e, s) => {
+    g.selectAll(".seg-rect").classed("dim", (o) => o.f !== s.f);
+    tip.innerHTML = `<b>${s.c.d.pais}</b> · ${s.f.k}<br>${twh(s.c.d[s.f.k])} · <b>${pct(s.share)}</b> del país` +
+      `<br><span class="t2">${(100 * s.c.d[s.f.k] / total).toLocaleString("ca-ES", { maximumFractionDigits: 1 })} % de tota l'electricitat de la UE</span>` +
+      `<br><span class="t2">Total del país: ${twh(s.c.d.total)} · renovable ${pct(s.c.d.renov)}</span>`;
+    tip.style.opacity = 1;
+    const tx = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8);
+    const ty = e.clientY + 14 + tip.offsetHeight > innerHeight ? e.clientY - tip.offsetHeight - 10 : e.clientY + 14;
+    tip.style.left = tx + "px"; tip.style.top = ty + "px";
+  }).on("pointerleave", () => { tip.style.opacity = 0; g.selectAll(".seg-rect").classed("dim", false); });
+
+  el.replaceChildren(svg.node());
+}
+
+const tip = document.getElementById("tip");
+document.querySelectorAll("#sort button").forEach((btn) => btn.addEventListener("click", () => {
+  document.querySelectorAll("#sort button").forEach((b) => b.setAttribute("aria-pressed", b === btn));
+  sortKey = btn.dataset.k;
+  render();
+}));
+new ResizeObserver(() => rows.length && render()).observe(document.querySelector("main"));
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => rows.length && render());
+addEventListener("temachange", () => rows.length && render());
+</script>
+</body>
+</html>
